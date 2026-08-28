@@ -441,3 +441,21 @@ staff record in the DB (only `admin` and `superadmin`). Per the user's choice, a
 - Staff record `SUNNY0001` / "Sunny Admin" (role admin) + login user `sunny`.
 - **Login:** `sunny` / `admin123` (same password convention as the original admin).
 - Verified end-to-end: `sunny` logs in and reaches the Dashboard with the topbar showing "Sunny".
+
+---
+
+## Milestone 18: Superadmin hidden from other users
+
+Per user request, the superadmin record now shows **only to the superadmin itself**. Any other
+role never sees the superadmin anywhere in the Staff module:
+
+- `StaffController::index()` excludes `role != 'superadmin'` from the count+list unless the
+  current user is the superadmin.
+- The staff filter dropdown hides the "superadmin" option from non-superadmin users.
+- Defense in depth: the existing `guardProtected()` still blocks non-superadmins from opening
+  `/staff/view/{superadmin-id}` directly (flash + redirect).
+
+### Verified (end-to-end)
+- `admin`'s staff list does **not** contain "Super Administrator"; the superadmin role option is
+  hidden from the admin's filter dropdown.
+- `superadmin`'s own staff list **does** show "Super Administrator".

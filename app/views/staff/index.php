@@ -17,7 +17,8 @@
             <label>Role</label>
           <select name="role" data-auto-submit>
             <option value="">All roles</option>
-            <?php foreach (['admin','superadmin','teacher','accountant','staff'] as $r): ?>
+            <?php $roles = is_superadmin() ? ['admin','superadmin','teacher','accountant','staff'] : ['admin','teacher','accountant','staff']; ?>
+            <?php foreach ($roles as $r): ?>
               <option value="<?= e($r) ?>" <?= $role===$r?'selected':'' ?>><?= e(ucfirst($r)) ?></option>
             <?php endforeach; ?>
           </select>

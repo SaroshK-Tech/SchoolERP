@@ -13,6 +13,9 @@ class StaffController
 
         $where = [];
         $params = [];
+        if (!is_superadmin()) {
+            $where[] = "role != 'superadmin'";
+        }
         if ($q !== '') {
             $where[] = "(first_name LIKE ? OR last_name LIKE ? OR employee_no LIKE ? OR email LIKE ?)";
             array_push($params, "%$q%", "%$q%", "%$q%", "%$q%");
