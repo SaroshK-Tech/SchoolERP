@@ -61,6 +61,28 @@ Initialized the SchoolERP project (PHP 8 + MySQL / XAMPP) in the repository root
 ### Committed
 - f5e42bb: scaffold; this milestone committed next.
 
+---
+
+## Milestone 3: Students + Classes & Sections + Bulk Promotion
+
+### Added
+- `app/controllers/StudentController.php` — registration + full CRUD:
+  - List with search, session/class/section filters, pagination.
+  - Registration form: personal, guardian, enrolment (session/class/section).
+  - Profile with fee payment history + enrolment history.
+- `app/controllers/ClassController.php` — class & section management:
+  - Add class (with multi-section creation), add section (room, capacity, class teacher), delete.
+  - Enrolment-based student counts.
+- `app/controllers/PromotionController.php` — bulk promotion:
+  - Select students, choose target session + option (next class / same class / graduate).
+  - Creates new enrolment in target session, sets `promoted_from_class_id`, marks status
+    `promoted` or `graduated` when no next class exists.
+- Views: `students/index`, `students/form`, `students/show`, `classes/index`, `promotion/index`.
+- Routes for promotion + section management.
+
+### Guards
+- Students: any logged-in user. Classes/sections/promotion: admin + accountant.
+
 ### Next
-- Students module (registration, class/section, bulk promotion).
-- Finance, Exams, Timetable, Notifications.
+- Finance module (payroll, fees, petty income/expense).
+- Exams & Results, Timetable, Notifications.

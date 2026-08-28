@@ -52,6 +52,8 @@ function register_routes(Router $route): void
     $route->get('classes/create', fn() => $cls->create());
     $route->post('classes/create', fn() => $cls->store());
     $route->post('classes/delete/{id}', fn($p) => $cls->destroy($p['id']));
+    $route->post('classes/section/create', fn() => $cls->sectionCreate());
+    $route->post('classes/section/{id}/delete', fn($p) => $cls->sectionDelete($p['id']));
 
     // Bulk promotion
     $prom = new PromotionController();
