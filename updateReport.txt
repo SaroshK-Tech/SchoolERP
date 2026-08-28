@@ -418,3 +418,15 @@ role can view, edit, or delete the superadmin account.
 - Regular `admin` is **blocked** from viewing, editing, and deleting the superadmin record, and
   cannot assign the superadmin role.
 - Superadmin can manage (even delete) their own record — only other roles are locked out.
+
+---
+
+## Milestone 16: Logout button in the topbar
+
+The logout route and `AuthController::logout()` already existed; added the missing **Logout**
+button to the topbar in `app/views/layouts/app.php` (next to the avatar in `.user-menu`).
+
+### Verified (end-to-end)
+- Topbar shows the Logout button after login.
+- Clicking Logout signs the user out and returns to the login page; the session is cleared
+  (accessing `/dashboard` afterwards redirects back to login).

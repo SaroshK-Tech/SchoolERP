@@ -62,6 +62,7 @@ $activePath = '/' . ltrim($activePath, '/');
           <div class="text-muted" style="font-size:12px; text-transform:capitalize;"><?= e($user['role'] ?? '') ?></div>
         </div>
         <div class="avatar"><?= e(strtoupper(substr($user['full_name'] ?? ($user['username'] ?? 'U'), 0, 1))) ?></div>
+        <a class="btn btn-outline btn-sm" href="<?= e(App::url('logout')) ?>" title="Sign out">Logout</a>
       </div>
     </header>
 
