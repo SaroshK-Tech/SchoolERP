@@ -51,6 +51,15 @@ function register_routes(Router $route): void
     $route->get('students/view/{id}', fn($p) => $student->show($p['id']));
     $route->post('students/delete/{id}', fn($p) => $student->destroy($p['id']));
 
+    // Academic sessions
+    $sess = new SessionController();
+    $route->get('sessions', fn() => $sess->index());
+    $route->post('sessions/create', fn() => $sess->create());
+    $route->get('sessions/edit/{id}', fn($p) => $sess->edit($p['id']));
+    $route->post('sessions/edit/{id}', fn($p) => $sess->update($p['id']));
+    $route->post('sessions/{id}/set-current', fn($p) => $sess->setCurrent($p['id']));
+    $route->post('sessions/delete/{id}', fn($p) => $sess->destroy($p['id']));
+
     // Classes & sections
     $cls = new ClassController();
     $route->get('classes', fn() => $cls->index());

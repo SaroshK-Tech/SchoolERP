@@ -3,6 +3,7 @@
 $appName = App::config('app.name', 'SchoolERP');
 $nav = [
     'Dashboard' => ['dashboard', '🏠'],
+    'Sessions' => ['sessions', '📅'],
     'Staff' => ['staff', '👥'],
     'Students' => ['students', '🎓'],
     'Classes' => ['classes', '🏫'],

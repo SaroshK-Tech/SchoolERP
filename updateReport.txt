@@ -339,3 +339,40 @@ installation (outside the repo):
 ### Note
 - If MySQL80 is ever started again it will re-bind port 3306 and conflict with XAMPP; keep
   only one running. The app now uses an empty root password matching `config/config.php`.
+
+---
+
+## Milestone 14: Academic Sessions module (full CRUD)
+
+Built a session-management module to create and perform CRUD on `academic_sessions` (the
+records already existed in the schema and are referenced by enrolments, exams, fees, timetable).
+
+### New files
+- `app/controllers/SessionController.php` — index (list w/ counts), create, edit, update,
+  set-current, destroy.
+- `app/views/sessions/index.php` — table (name, dates, Active/Inactive badge, student/exam/
+  payment counts) + inline "New Session" create form.
+- `app/views/sessions/edit.php` — edit form (name, dates, set-active checkbox).
+
+### Changes
+- `app/routes.php` — added routes:
+  - `GET sessions`
+  - `POST sessions/create`
+  - `GET|POST sessions/edit/{id}`
+  - `POST sessions/{id}/set-current`
+  - `POST sessions/delete/{id}`
+- `app/views/layouts/app.php` — added "Sessions" nav link (📅, after Dashboard).
+
+### Behavior / guards
+- First session is auto-set as the active session; "Set Active"/edit checkbox switches the
+  current session (unsets all others first).
+- Cannot delete the **last remaining** session.
+- Cannot delete the **active** session (must set another active first).
+- Duplicate `name` blocked; end date must be >= start date.
+- Delete is admin-only; related records cascade via existing FKs (warning shown in UI).
+
+### Verified (end-to-end HTTP + DB)
+- Login lands on Dashboard; `/sessions` list 200.
+- Created `2025-2026` (made current, confirmed in DB), set `2024-2025` active, renamed via
+  edit, deleted the inactive session, and confirmed deleting the active session is blocked.
+- Final DB state: only `2024-2025` remains and is `is_current=1`.
