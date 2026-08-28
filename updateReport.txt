@@ -291,3 +291,23 @@ missing-extension case gracefully so it never crashes with
   XAMPP command + PHP 8.4.24 binary path.
 - Regression with the **XAMPP PHP**: login + all modules return 200 (staff, students,
   promotion, finance, exams, timetable, notifications).
+
+---
+
+## Milestone 12: Root-cause fix — enable mysqli in the WinGet PHP 8.4
+
+The WinGet PHP on PATH had the `php_mysqli.dll` present in `ext\` but it was commented out in
+its `php.ini`. That's why the *documented* `php -S ...` command crashed. Fixed the actual PHP
+installation (outside the repo):
+
+### Change (WinGet PHP 8.4, `...\PHP.PHP.8.4...\php.ini`)
+- Uncommented `extension=mysqli` and `extension=pdo_mysql` (they were disabled/comment lines).
+- `php -m` now reports `mysqli` and `pdo_mysql`; `mysqli_report()` is defined.
+
+### Result
+- The plain `php` on PATH now works: `php -S 127.0.0.1:8000 -t public public\_router.php`
+  serves the app correctly. Run the whole ERP with the documented command.
+- Verified end-to-end with the WinGet PHP: login + `/`, staff, students, classes, promotion,
+  finance, exams, timetable, notifications, `staff/create` all return 200.
+- The defensive `check_mysqli()` guard from Milestone 11 stays as a safety net (it now never
+  triggers, but protects against any future PHP without mysqli).

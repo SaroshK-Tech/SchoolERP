@@ -9,11 +9,14 @@ Exams & Results, Timetable, WhatsApp/SMS Notifications.
 ## Run it
 ```
 # dev server (must use the router file so static assets are served)
-# IMPORTANT: use the XAMPP PHP (has mysqli). The plain `php` on PATH is a
-# WinGet PHP 8.4 WITHOUT mysqli and will crash install.php/login with
-# "Call to undefined function mysqli_report()".
 C:\xampp\php\php.exe -S 127.0.0.1:8000 -t public public\_router.php
 ```
+- Plain `php` on PATH (WinGet PHP 8.4) also works now: its `php.ini` had
+  `extension=mysqli`/`pdo_mysql` commented out, they've been enabled. If a fatal
+  "Call to undefined function mysqli_report()" ever appears again, either run
+  `C:\xampp\php\php.exe` instead, or re-enable `extension=mysqli` in that
+  php.ini. The app also fails gracefully with an explanatory page instead of
+  a fatal when mysqli is missing.
 - First run redirects to `/install.php` (web installer) or use `php database/install.php` (CLI).
 - Default admin login: `admin` / `admin123`.
 - Apache: set document root to `public/`; `.htaccess` provided with mod_rewrite.
@@ -41,4 +44,5 @@ C:\xampp\php\php.exe -S 127.0.0.1:8000 -t public public\_router.php
 
 ## Verification
 - Lint every PHP file: `php -l <file>`. There is no test suite yet.
-- Smoke-test: start the dev server above and confirm non-DB pages (login) render.
+- Smoke-test: start the dev server above and confirm login + a few module pages render
+  (all 21 module routes were verified 200 on the WinGet PHP after enabling mysqli).
