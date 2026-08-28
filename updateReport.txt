@@ -102,5 +102,25 @@ Initialized the SchoolERP project (PHP 8 + MySQL / XAMPP) in the repository root
 ### Guards
 - Payroll, fee structure, fee collection, petty: admin + accountant. Viewing fee payments: any login.
 
+---
+
+## Milestone 5: Exams & Results module
+
+### Added
+- `app/controllers/ExamController.php`:
+  - Exam management: create, list, view with enrolled students.
+  - **Schedule**: add/remove subjects (date, time, full/pass marks) per exam.
+  - **Results entry**: grid of students × subjects with marks + remarks; auto grade
+    (A+/A/B/C/D/F based on full marks); empty cells delete the result row.
+  - **Report card**: per-student summary with total, percentage, PASS/FAIL, printable
+    (print CSS media rules).
+  - **Subjects**: create subjects, assign teachers to subjects, remove assignments.
+- Views: `exams/index`, `exams/create`, `exams/show`, `exams/schedule`, `exams/results`,
+  `exams/report_card`, `exams/subjects`.
+
+### Guards
+- Create/schedule/results: admin + accountant + teacher. Create exam/subjects/schedule: admin + accountant.
+
 ### Next
-- Exams & Results, Timetable, Notifications.
+- Timetable module (class/teacher filters + print).
+- WhatsApp/SMS Notifications module.
