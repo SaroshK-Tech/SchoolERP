@@ -169,3 +169,48 @@ Initialized the SchoolERP project (PHP 8 + MySQL / XAMPP) in the repository root
 
 ## All 6 required modules now implemented
 Staff, Students (+classes/sections/promotion), Finance, Exams & Results, Timetable, Notifications.
+
+---
+
+## Milestone 8: Installer, DB guard, built-in server router, routing fix
+
+### Added
+- `public/install.php` — web installer: creates the `school_erp` database + schema + seed
+  data using configured DB credentials; shows the default admin login on success.
+- `database/install.php` — CLI installer (`php database/install.php`).
+- `app/Schema.php` — `installed()` helper (checks `users` table exists).
+- DB guard in `public/index.php`: non-login/install/asset requests redirect to `install.php`
+  when the schema is missing, instead of crashing.
+- `public/_router.php` — router file for `php -S` so static assets are served directly while
+  everything else goes through the front controller.
+- `public/.htaccess` — Apache rewrite config (docroot = `public/`).
+
+### Fixed (important)
+- **Router bug**: route patterns lacked an optional leading slash, so `GET /login` (normalized
+  to `/login`) never matched the stored pattern `login` → all routes returned 404. Now the
+  regex allows an optional leading slash: `#^/?<pattern>/?$#`. Verified live: login page + CSS
+  render (HTTP 200).
+
+### How to run
+```
+# built-in dev server
+php -S 127.0.0.1:8000 -t public public/_router.php
+```
+Then visit `http://127.0.0.1:8000/`, it will redirect to the installer (`/install.php`), click
+"Install Database", then sign in with `admin` / `admin123`.
+
+### DB status (environment blocker)
+- The running MySQL on port 3306 is the **MySQL80 Windows service** (not the XAMPP one). It
+  rejects `root` with an empty password (a root password is set), and this shell is **not
+  elevated**, so the service cannot be stopped/reset without admin rights. The app is
+  configured for `root/empty` per your choice. To provision the DB you have two options:
+  1. Provide the real MySQL root password → put it in `config/local.php` and run
+     `php database/install.php`.
+  2. Reset root to empty (as admin; PowerShell as **Administrator**):
+     ```
+     Stop-Service MySQL80
+     # start mysqld with skip-grant-tables, then:
+     # ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '';
+     Start-Service MySQL80
+     ```
+  Then run the installer. Everything else already runs (verified login page + asset serving).

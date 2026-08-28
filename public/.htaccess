@@ -1,0 +1,22 @@
+# SchoolERP - Apache configuration.
+# Place these in the Apache vhost (apache/conf/vhosts) or keep as .htaccess.
+# Requires mod_rewrite. Document root should point here (public/).
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Make sure .htaccess files are read (if AllowOverride All).
+
+    # Route all non-file/non-directory and non-asset requests to the front controller.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} !^/assets/
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>
+
+# Block access to hidden files
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+Options -Indexes

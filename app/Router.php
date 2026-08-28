@@ -41,7 +41,7 @@ class Router
             if ($route['method'] !== $method) continue;
 
             $pattern = preg_replace('#\{(\w+)\}#', '(?P<$1>[^/]+)', $route['path']);
-            $pattern = '#^' . $pattern . '/?$#';
+            $pattern = '#^/?' . $pattern . '/?$#';
 
             if (preg_match($pattern, $path, $m)) {
                 $params = [];

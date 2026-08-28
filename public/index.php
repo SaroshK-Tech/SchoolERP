@@ -14,10 +14,22 @@ require $base . '/app/Auth.php';
 require $base . '/app/helpers.php';
 require $base . '/app/view.php';
 require $base . '/app/Router.php';
+require $base . '/app/Schema.php';
 
 App::boot();
 
-// Ensure DB is installable: if schema not present and a flag is set, run installer.
+$requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
+$requestPath = '/' . ltrim($requestPath, '/');
+$isBypass = in_array($requestPath, ['/login', '/install.php'], true)
+            || str_starts_with($requestPath, '/assets/');
+
+// If DB/schema is missing and this isn't a bypass route, guide to the installer.
+if (!$isBypass && !Schema::installed()) {
+    $baseUrl = rtrim((string)App::config('app.base_url', ''), '/');
+    header('Location: ' . ($baseUrl ?: '') . '/install.php');
+    exit;
+}
+
 require_once $base . '/app/routes.php';
 
 $route = new Router();

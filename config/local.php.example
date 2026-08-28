@@ -1,0 +1,27 @@
+<?php
+/**
+ * Per-machine configuration override.
+ * Copy this file to config/local.php (git-ignored) and change values as needed.
+ * Merge happens after config/config.php.
+ */
+return [
+    'db' => [
+        'host'    => '127.0.0.1',
+        'port'    => 3306,
+        'name'    => 'school_erp',
+        'user'    => 'root',
+        'pass'    => '',           // <-- put the real MySQL password here
+    ],
+    'notifications' => [
+        'dry_run' => true,        // set false to send real WhatsApp/SMS
+        'sms' => [
+            'provider' => 'twilio',
+            'twilio_sid' => '',
+            'twilio_token' => '',
+            'twilio_from' => '',
+        ],
+        'whatsapp' => [
+            'twilio_whatsapp_from' => 'whatsapp:+14155238886',
+        ],
+    ],
+];
