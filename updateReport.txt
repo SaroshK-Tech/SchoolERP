@@ -83,6 +83,24 @@ Initialized the SchoolERP project (PHP 8 + MySQL / XAMPP) in the repository root
 ### Guards
 - Students: any logged-in user. Classes/sections/promotion: admin + accountant.
 
+---
+
+## Milestone 4: Finance module
+
+### Added
+- `app/controllers/FinanceController.php`:
+  - **Overview** dashboard (fees collected, monthly fees, petty income/expense, payroll paid).
+  - **Payroll**: list periods, generate a payroll period (auto-created entries from each staff
+    member's salary basis: basic + allowances − deductions = net), mark a period as paid.
+  - **Fee management**: fee structures per class (amount + frequency), collect a payment
+    (auto receipt number, mode, reference), list all payments with search.
+  - **Petty income/expense**: ledger with type filter, totals, and add-entry form.
+- Views: `finance/_nav` (shared sub-nav), `overview`, `payroll`, `payroll_generate`, `fees`,
+  `fee_payments`, `petty`.
+- Routes for all finance actions.
+
+### Guards
+- Payroll, fee structure, fee collection, petty: admin + accountant. Viewing fee payments: any login.
+
 ### Next
-- Finance module (payroll, fees, petty income/expense).
 - Exams & Results, Timetable, Notifications.
