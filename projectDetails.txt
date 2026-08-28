@@ -1,0 +1,16 @@
+i want you to create a production grade School Management ERP with all professional features in php i have xampp installed. this system used as ERP not as Student or parent portal . make UXUI professional and shoud have following features:
+1. Staff Management
+2. Student Information (registration, Class and section management and bulk promotion to change passed student)
+3. Finance (Payroll, Fee Management, petty Income and Expense)
+4. Exam & Result system
+5. Timetable (with class and teacher filters print options)
+6. whatsapp and sms sending notifications
+
+
+also you can add other features if you want but let me know first
+
+also make github repo (if you want credentials of my github let me know
+
+create database in mysql
+
+and also make complete project in same folder here not in xampp htdocs

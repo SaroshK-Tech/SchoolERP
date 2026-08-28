@@ -1,0 +1,23 @@
+# PHP / Composer
+/vendor/
+composer.lock
+
+# Local config overrides (never commit real secrets)
+/config/local.php
+
+# Logs
+*.log
+/storage/logs/*.log
+/storage/tmp/*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.sw[op]
+.idea/
+.vscode/
+.vscode-server/
+
+# Environment
+.env
+.env.*

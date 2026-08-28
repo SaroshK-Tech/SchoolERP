@@ -1,0 +1,41 @@
+# SchoolERP — Update Report
+
+Date: 2026-08-29
+
+## Milestone 1: Project scaffold & foundation
+
+Initialized the SchoolERP project (PHP 8 + MySQL / XAMPP) in the repository root.
+
+### Added
+- `.gitignore` — excludes vendor/, local config secrets, logs, editor files.
+- `database/schema.sql` — full MySQL schema (`school_erp`) covering all 6 modules:
+  - Staff Management (`staff`, `staff_documents`)
+  - Auth (`users`, ties to staff)
+  - Students + Classes/Sections (`students`, `student_enrolments`, `classes`, `sections`)
+  - Finance (`fee_structures`, `fee_payments`, `payroll_periods`, `payroll_entries`, `staff_salary_basis`, `petty_ledger`)
+  - Exam & Results (`exams`, `subjects`, `exam_schedules`, `exam_results`, `teacher_subjects`)
+  - Timetable (`timetable_slots`, `timetable_entries`)
+  - Notifications (`notification_logs`), settings table
+  - Seed data: default academic session, admin user (admin/admin123), 6 timetable slots.
+- `config/config.php` — app, DB (root/empty per spec), notification gateway config.
+- `app/` core:
+  - `App.php` (boot, config, paths, redirects)
+  - `Database.php` (PDO-free mysqli wrapper: prepared statements)
+  - `Auth.php` (login, session, role guards)
+  - `helpers.php` (e, redirect, old, flash, csrf, formatting)
+  - `view.php` (view + layout rendering)
+  - `Router.php` (GET/POST router with {param} placeholders, CSRF + JSON support)
+  - `routes.php` (route table + autoloader for controllers)
+- `public/index.php` — front controller / router.
+- `public/assets/css/app.css` — professional, responsive admin UI.
+- `public/assets/js/app.js` — confirm dialogs, auto-dismiss alerts, check-all, auto-submit filters.
+- Controllers: `AuthController`, `DashboardController`.
+- Views: `layouts/app`, `auth/login`, `dashboard/index`, `errors/404`.
+
+### Current status
+- Purpose-built, modular single-root PHP app. Runs via `php -S 127.0.0.1:8000 -t public public/index.php` or Apache docroot → `public/`.
+- NOT yet DB-connected at runtime (schema exists, DB install flow pending).
+- Still to build: Staff, Students, Classes, Promotion, Finance, Exams, Timetable, Notifications controllers/views.
+
+### Environment note
+- XAMPP MySQL is running (port 3306) but `root` with empty password is currently rejected by the running server (the bundled `passwords.txt` says empty, but the live server denies it). Config targets root/empty per spec; final DB provisioning step will confirm/reset credentials.
