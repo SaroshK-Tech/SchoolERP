@@ -92,6 +92,7 @@ class StaffController
         );
 
         $this->saveSalaryBasis($id, $data);
+        $this->syncLogin((int)$id, $data);
 
         flash_set('success', "Staff member \"{$data['first_name']} {$data['last_name']}\" added.");
         redirect('staff');

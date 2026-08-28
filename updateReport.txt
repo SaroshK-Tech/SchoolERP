@@ -459,3 +459,21 @@ role never sees the superadmin anywhere in the Staff module:
 - `admin`'s staff list does **not** contain "Super Administrator"; the superadmin role option is
   hidden from the admin's filter dropdown.
 - `superadmin`'s own staff list **does** show "Super Administrator".
+
+---
+
+## Milestone 19: Fix "Add Staff with login" not creating the account
+
+**Bug:** when adding a new staff member through the Staff form with "Create a login", the login
+user was never saved, so the new user could not log in ("invalid username or password"). The
+`users` row was never created because `StaffController::store()` collected the login fields
+(`create_login`/`username`/`password`) but **never called `syncLogin()`** — only `update()` did.
+
+**Fix:** added `$this->syncLogin((int)$id, $data);` in `store()` right after the staff insert and
+salary-basis save, matching `update()`.
+
+### Verified (end-to-end)
+- Added a new staff "kkashif" (employee KKASHIF01) with a login via the web UI; the login user was
+  created and `kkashif` / `123456` logged in successfully (Dashboard).
+- The placeholder test record created during verification was removed afterwards so the user can
+  re-add their staff member with correct details.
