@@ -9,7 +9,10 @@ Exams & Results, Timetable, WhatsApp/SMS Notifications.
 ## Run it
 ```
 # dev server (must use the router file so static assets are served)
-php -S 127.0.0.1:8000 -t public public/_router.php
+# IMPORTANT: use the XAMPP PHP (has mysqli). The plain `php` on PATH is a
+# WinGet PHP 8.4 WITHOUT mysqli and will crash install.php/login with
+# "Call to undefined function mysqli_report()".
+C:\xampp\php\php.exe -S 127.0.0.1:8000 -t public public\_router.php
 ```
 - First run redirects to `/install.php` (web installer) or use `php database/install.php` (CLI).
 - Default admin login: `admin` / `admin123`.

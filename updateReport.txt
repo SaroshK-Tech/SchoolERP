@@ -242,3 +242,23 @@ Then visit `http://127.0.0.1:8000/`, it will redirect to the installer (`/instal
 ### Git
 - `config/local.php` is confirmed git-ignored (secrets not committed).
 - Pushed to GitHub: `https://github.com/SaroshK-Tech/SchoolERP.git`
+
+---
+
+## Milestone 10: Fix "Call to undefined function mysqli_report()" (WinGet PHP on PATH)
+
+### Root cause
+- The `php` on PATH is the **WinGet PHP 8.4** (`C:\Users\BitDev\...\WinGet\Packages\PHP.PHP.8.4...`)
+  which is compiled **without the mysqli extension**. When a dev server was started with that
+  binary, `public/install.php` (and login) crashed with
+  `Call to undefined function mysqli_report()`.
+- The **XAMPP PHP 8.2** (`C:\xampp\php\php.exe`) has `mysqli` + `pdo_mysql` enabled in
+  `C:\xampp\php\php.ini`.
+
+### Fix
+- Always run the dev server with the XAMPP PHP binary:
+  ```
+  C:\xampp\php\php.exe -S 127.0.0.1:8000 -t public public\_router.php
+  ```
+- Verified: `install.php` returns 200 (no fatal), login page 200. Recorded in AGENTS.md so
+  future sessions use the correct PHP.
