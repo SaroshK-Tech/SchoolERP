@@ -72,6 +72,9 @@
             <?php foreach (['staff','teacher','accountant','admin'] as $r): ?>
               <option value="<?= e($r) ?>" <?= ($staff['role'] ?? '') === $r ? 'selected' : '' ?>><?= e(ucfirst($r)) ?></option>
             <?php endforeach; ?>
+            <?php if (is_superadmin()): ?>
+              <option value="superadmin" <?= ($staff['role'] ?? '') === 'superadmin' ? 'selected' : '' ?>>🔑 Superadmin</option>
+            <?php endif; ?>
           </select>
         </div>
         <div class="form-row">

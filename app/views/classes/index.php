@@ -19,7 +19,7 @@
               <td class="text-right">
                 <form method="post" action="<?= e(App::url('classes/section/' . $sec['id'] . '/delete')) ?>" style="display:inline;">
                   <?= csrf_field() ?>
-                  <button class="btn btn-danger btn-sm" data-confirm="Delete this section?" <?= Auth::user()['role']!=='admin'?'disabled title="Admins only"':'' ?>>Delete</button>
+                  <button class="btn btn-danger btn-sm" data-confirm="Delete this section?" <?= !is_admin()?'disabled title="Admins only"':'' ?>>Delete</button>
                 </form>
               </td>
             </tr>

@@ -56,6 +56,7 @@ foreach ($statements as $stmt) {
 }
 
 echo "\nDatabase '{$db['name']}' is ready.\n";
-echo "Default admin login:  admin / admin123\n";
+echo "Default admin login:      admin / admin123\n";
+echo "Superadmin login: superadmin / superadmin123\n";
 $conn->close();
 exit(0);

@@ -97,6 +97,7 @@ class StaffController
     public function edit(string $id): void
     {
         require_role(['admin', 'accountant']);
+        $this->guardProtected((int)$id);
         $staff = Database::one("SELECT * FROM staff WHERE id=?", [(int)$id]);
         if (!$staff) { flash_set('danger', 'Staff member not found.'); redirect('staff'); }
 
@@ -114,6 +115,7 @@ class StaffController
     {
         require_role(['admin', 'accountant']);
         csrf_check();
+        $this->guardProtected((int)$id);
 
         $data = $this->payload();
         if (!$this->validate($data, (int)$id, $errors)) {
@@ -146,6 +148,7 @@ class StaffController
     public function show(string $id): void
     {
         require_role(['admin', 'accountant']);
+        $this->guardProtected((int)$id);
         $staff = Database::one("SELECT * FROM staff WHERE id=?", [(int)$id]);
         if (!$staff) { flash_set('danger', 'Staff member not found.'); redirect('staff'); }
         $basis = Database::one("SELECT * FROM staff_salary_basis WHERE staff_id=?", [(int)$id]);
@@ -166,6 +169,7 @@ class StaffController
     {
         require_role(['admin']);
         csrf_check();
+        $this->guardProtected((int)$id, true);
         $existed = Database::one("SELECT id FROM staff WHERE id=?", [(int)$id]);
         if ($existed) {
             Database::execute("DELETE FROM staff_salary_basis WHERE staff_id=?", [(int)$id]);
@@ -178,6 +182,21 @@ class StaffController
     }
 
     // ----- helpers -----
+
+    /**
+     * Superadmin staff records are protected: only the superadmin may view or
+     * edit them. Deletion additionally requires the superadmin role.
+     */
+    private function guardProtected(int $staffId, bool $strict = false): void
+    {
+        if (!is_protected_staff($staffId)) return;
+        if (is_superadmin()) return;
+        $msg = $strict
+            ? 'The superadmin account is protected and cannot be deleted.'
+            : 'The superadmin account is protected and cannot be managed by other roles.';
+        flash_set('danger', $msg);
+        redirect('staff');
+    }
 
     private function payload(): array
     {
@@ -214,7 +233,13 @@ class StaffController
         if ($d['first_name'] === '') $errors[] = 'First name is required.';
         if ($d['employee_no'] === '') $errors[] = 'Employee number is required.';
         if ($d['designation'] === '') $errors[] = 'Designation is required.';
-        if (!in_array($d['role'], ['admin', 'teacher', 'accountant', 'staff'], true)) $errors[] = 'Invalid role.';
+        $validRoles = ['staff', 'teacher', 'accountant', 'admin'];
+        if (is_superadmin()) {
+            $validRoles[] = 'superadmin';
+        }
+        if (!in_array($d['role'], $validRoles, true)) {
+            $errors[] = 'Invalid role.';
+        }
 
         // uniqueness of employee_no
         $dup = Database::one("SELECT id FROM staff WHERE employee_no=? LIMIT 1", [$d['employee_no']]);

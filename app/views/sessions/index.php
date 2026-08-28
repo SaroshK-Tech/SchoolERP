@@ -41,7 +41,7 @@
                 <a class="btn btn-outline btn-sm" href="<?= e(App::url('sessions/edit/' . $s['id'])) ?>">Edit</a>
                 <form method="post" action="<?= e(App::url('sessions/delete/' . $s['id'])) ?>" style="display:inline;">
                   <?= csrf_field() ?>
-                  <button class="btn btn-danger btn-sm" data-confirm="Delete this session and ALL its enrolments, exams, fees & timetable data?" <?= (Auth::user()['role']!=='admin' || (int)$s['is_current']===1) ? 'disabled title="Admins only; cannot delete the active session"' : '' ?>>Delete</button>
+                  <button class="btn btn-danger btn-sm" data-confirm="Delete this session and ALL its enrolments, exams, fees & timetable data?" <?= (!is_admin() || (int)$s['is_current']===1) ? 'disabled title="Admins only; cannot delete the active session"' : '' ?>>Delete</button>
                 </form>
               </td>
             </tr>

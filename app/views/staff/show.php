@@ -14,7 +14,11 @@
     </div>
   </div>
   <div class="row">
-    <a class="btn btn-outline" href="<?= e(App::url('staff/edit/' . $staff['id'])) ?>">Edit</a>
+    <?php if (can_manage_staff((int)$staff['id'])): ?>
+      <a class="btn btn-outline" href="<?= e(App::url('staff/edit/' . $staff['id'])) ?>">Edit</a>
+    <?php else: ?>
+      <span class="badge badge-danger">👑 Protected superadmin</span>
+    <?php endif; ?>
     <a class="btn btn-outline" href="<?= e(App::url('staff')) ?>">Back</a>
   </div>
 </div>

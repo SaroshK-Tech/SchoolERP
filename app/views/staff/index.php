@@ -14,10 +14,10 @@
           <input type="text" name="q" value="<?= e($q) ?>" placeholder="Name, ID, email...">
         </div>
         <div class="form-row">
-          <label>Role</label>
+            <label>Role</label>
           <select name="role" data-auto-submit>
             <option value="">All roles</option>
-            <?php foreach (['admin','teacher','accountant','staff'] as $r): ?>
+            <?php foreach (['admin','superadmin','teacher','accountant','staff'] as $r): ?>
               <option value="<?= e($r) ?>" <?= $role===$r?'selected':'' ?>><?= e(ucfirst($r)) ?></option>
             <?php endforeach; ?>
           </select>
@@ -55,7 +55,7 @@
             <td><a href="<?= e(App::url('staff/view/' . $s['id'])) ?>"><strong><?= e($s['first_name'] . ' ' . $s['last_name']) ?></strong></a></td>
             <td><?= e($s['designation']) ?></td>
             <td><?= e($s['department'] ?: '—') ?></td>
-            <td><span class="badge badge-brand"><?= e(ucfirst($s['role'])) ?></span></td>
+            <td><?= $s['role'] === 'superadmin' ? '<span class="badge badge-danger">👑 Superadmin</span>' : '<span class="badge badge-brand">' . e(ucfirst($s['role'])) . '</span>' ?></td>
             <td><?= e($s['phone'] ?: '—') ?><br><span class="text-muted" style="font-size:12px;"><?= e($s['email'] ?: '') ?></span></td>
             <td>
               <?php if ($s['is_active']): ?>
@@ -64,13 +64,17 @@
                 <span class="badge badge-danger">Inactive</span>
               <?php endif; ?>
             </td>
-            <td class="text-right">
+            <td class="text-right" style="white-space:nowrap;">
+              <?php if (!can_manage_staff((int)$s['id'])): ?>
+                <span class="badge badge-muted" title="Protected superadmin account">🔒 Protected</span>
+              <?php else: ?>
               <a class="btn btn-outline btn-sm" href="<?= e(App::url('staff/view/' . $s['id'])) ?>">View</a>
               <a class="btn btn-outline btn-sm" href="<?= e(App::url('staff/edit/' . $s['id'])) ?>">Edit</a>
               <form method="post" action="<?= e(App::url('staff/delete/' . $s['id'])) ?>" style="display:inline;">
                 <?= csrf_field() ?>
-                <button type="submit" class="btn btn-danger btn-sm" data-confirm="Delete this staff member?" <?= Auth::user()['role'] !== 'admin' ? 'disabled title="Admins only"' : '' ?>>Delete</button>
+                <button type="submit" class="btn btn-danger btn-sm" data-confirm="Delete this staff member?" <?= !is_admin() ? 'disabled title="Admins only"' : '' ?>>Delete</button>
               </form>
+              <?php endif; ?>
             </td>
           </tr>
         <?php endforeach; ?>

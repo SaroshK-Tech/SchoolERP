@@ -34,10 +34,14 @@ C:\xampp\php\php.exe -S 127.0.0.1:8000 -t public public\_router.php
 ## Conventions / gotchas
 - DB credentials live in `config/config.php` or override in `config/local.php` (copy
   `config/local.php.example`). Do NOT commit `config/local.php`.
-- Config targets **root/empty** currently. The running MySQL on port 3306 is the **MySQL80
-  Windows service** and its root has a password — see `updateReport.txt` for reset steps.
+- Config targets **root/empty** currently. The running MySQL on port 3306 is the **XAMPP
+  MySQL/MariaDB** (not the MySQL80 service) and root has an empty password. If MySQL80's root
+  password ever returns, see `updateReport.txt` for reset steps.
 - All response data passed through `e()` (HTML-escape) in views; controllers call `csrf_check()`
-  on POSTs. Auth/role guards: `require_role([...])` (admin/accountant/teacher).
+  on POSTs. Auth/role guards: `require_role([...])` (admin/accountant/teacher); `superadmin`
+  bypasses every role gate. Superadmin staff records are **protected** — other roles cannot
+  view/edit/delete them (`is_protected_staff()` / `can_manage_staff()`). Default logins:
+  `admin`/`admin123` and `superadmin`/`superadmin123`.
 - Router gotcha: route patterns are stored without a leading slash but matched with an optional
   one (`#^/?<pattern>/?$#`) — keep route paths slash-less (e.g. `staff/edit/{id}`).
 - Summaries/changes are tracked in `updateReport.txt` at repo root.

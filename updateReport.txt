@@ -376,3 +376,45 @@ records already existed in the schema and are referenced by enrolments, exams, f
 - Created `2025-2026` (made current, confirmed in DB), set `2024-2025` active, renamed via
   edit, deleted the inactive session, and confirmed deleting the active session is blocked.
 - Final DB state: only `2024-2025` remains and is `is_current=1`.
+
+---
+
+## Milestone 15: Superadmin role (full authorization, protected account)
+
+Added a `superadmin` role as the main administrator with **complete authorization**; no other
+role can view, edit, or delete the superadmin account.
+
+### Schema (`database/schema.sql`)
+- Added `superadmin` to the `role` ENUM on both `staff` and `users`.
+- Seeded a dedicated superadmin: staff `SUPER0001` "Super Administrator" linked to user
+  `superadmin` / `superadmin123`.
+
+### Auth helpers (`app/helpers.php`)
+- `is_superadmin()` — current user is superadmin.
+- `is_admin()` — role is admin or superadmin.
+- `require_role()` — **superadmin bypasses every role gate** (full authorization).
+- `require_superadmin()` — superadmin-only guard.
+- `is_protected_staff($staffId)` — is the staff record linked to a superadmin user.
+- `can_manage_staff($staffId)` — allowed for superadmin, or any non-protected record.
+
+### Staff protection (`app/controllers/StaffController.php`)
+- `edit`, `update`, `show`, `destroy` call `guardProtected()`: non-superadmins are blocked
+  (flash + redirect) from viewing, editing, updating, or deleting the superadmin's record.
+- `validate()`: only a superadmin may persist the `superadmin` role (forged payload rejected).
+
+### Views
+- `staff/index.php` — superadmin row shows a 🔒 Protected badge (no actions) to non-superadmins,
+  👑 Superadmin badge, `superadmin` in the role filter, and `is_admin()` for delete gating.
+- `staff/show.php` — hides Edit on protected record for non-superadmins.
+- `staff/form.php` — `superadmin` role option shown only to superadmins.
+- `classes/index.php`, `sessions/index.php` — delete buttons now use `is_admin()` so superadmin
+  is not blocked.
+
+### Live DB (XAMPP)
+- Applied ENUM ALTERs and seeded `superadmin`, then verified via HTTP.
+
+### Verified (end-to-end)
+- Superadmin logs in; views/edits own record; full access to admin-only pages.
+- Regular `admin` is **blocked** from viewing, editing, and deleting the superadmin record, and
+  cannot assign the superadmin role.
+- Superadmin can manage (even delete) their own record — only other roles are locked out.

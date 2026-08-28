@@ -82,14 +82,58 @@ function require_login(): void
     }
 }
 
-/** Guard: require one of the given roles. */
+/** Is the current user a superadmin (full authorization)? */
+function is_superadmin(): bool
+{
+    return (Auth::user()['role'] ?? '') === 'superadmin';
+}
+
+/** Is the current user an admin or superadmin? */
+function is_admin(): bool
+{
+    return in_array(Auth::user()['role'] ?? '', ['admin', 'superadmin'], true);
+}
+
+/** Guard: require one of the given roles. Superadmin bypasses every check. */
 function require_role(array $roles): void
 {
     require_login();
+    if (is_superadmin()) return;
     if (!in_array(Auth::user()['role'] ?? '', $roles, true)) {
         flash_set('danger', 'You do not have permission to access that area.');
         redirect('dashboard');
     }
+}
+
+/** Guard: only the superadmin may pass. */
+function require_superadmin(): void
+{
+    require_login();
+    if (!is_superadmin()) {
+        flash_set('danger', 'Only the superadmin may perform this action.');
+        redirect('dashboard');
+    }
+}
+
+/**
+ * Is the given staff id linked to a superadmin user account?
+ * Superadmin records are protected: no other role may view/edit/delete them.
+ */
+function is_protected_staff(int $staffId): bool
+{
+    if ($staffId <= 0) return false;
+    $row = Database::one(
+        "SELECT u.id FROM users u WHERE u.staff_id = ? AND u.role = 'superadmin' LIMIT 1",
+        [$staffId]
+    );
+    return (bool)$row;
+}
+
+/** May the current user manage the given staff record (false if it is a protected superadmin and they are not superadmin)? */
+function can_manage_staff(int $staffId): bool
+{
+    if (is_superadmin()) return true;
+    return !is_protected_staff($staffId);
 }
 
 function csrf_token(): string

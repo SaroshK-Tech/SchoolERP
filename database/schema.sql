@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS staff (
   address TEXT NULL,
   designation VARCHAR(100) NOT NULL,
   department VARCHAR(100) NULL,
-  role ENUM('admin','teacher','accountant','staff') NOT NULL DEFAULT 'staff',
+  role ENUM('superadmin','admin','teacher','accountant','staff') NOT NULL DEFAULT 'staff',
   join_date DATE NULL,
   leave_date DATE NULL,
   is_active TINYINT(1) NOT NULL DEFAULT 1,
@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS users (
   username VARCHAR(80) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
   staff_id INT UNSIGNED NULL,
-  role ENUM('admin','teacher','accountant','staff') NOT NULL DEFAULT 'staff',
+  role ENUM('superadmin','admin','teacher','accountant','staff') NOT NULL DEFAULT 'staff',
   is_active TINYINT(1) NOT NULL DEFAULT 1,
   last_login_at DATETIME NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -370,6 +370,15 @@ WHERE NOT EXISTS (SELECT 1 FROM staff WHERE role='admin');
 INSERT INTO users (username, password_hash, staff_id, role, is_active)
 SELECT 'admin', '$2y$12$1aLXn1yVAB8jDqt7quZb4eH9sMeFRzkBE.p3VwpoaUuFWTOWtpFZ2', id, 'admin', 1
 FROM staff WHERE role='admin' LIMIT 1;
+
+-- Superadmin (username: superadmin / password: superadmin123) — full authorization.
+INSERT INTO staff (employee_no, first_name, last_name, role, designation, department, is_active)
+SELECT 'SUPER0001', 'Super', 'Administrator', 'superadmin', 'Super Administrator', 'Administration', 1
+WHERE NOT EXISTS (SELECT 1 FROM staff WHERE role='superadmin');
+
+INSERT INTO users (username, password_hash, staff_id, role, is_active)
+SELECT 'superadmin', '$2y$12$ntN3ZvJMGn0fOMAQQGS/YO.kEylytgXpSq7tJkzCiK09gzYwPzeLm', id, 'superadmin', 1
+FROM staff WHERE role='superadmin' LIMIT 1;
 
 INSERT INTO timetable_slots (name, start_time, end_time, sort_order) VALUES
 ('Period 1', '08:00:00', '08:45:00', 1),
