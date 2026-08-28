@@ -121,6 +121,22 @@ Initialized the SchoolERP project (PHP 8 + MySQL / XAMPP) in the repository root
 ### Guards
 - Create/schedule/results: admin + accountant + teacher. Create exam/subjects/schedule: admin + accountant.
 
+---
+
+## Milestone 6: Timetable module
+
+### Added
+- `app/controllers/TimetableController.php`:
+  - **View**: filters by session, class, section, or teacher (class OR teacher focus).
+  - Renders a day × period grid with subject + teacher; print-ready.
+  - **Edit**: pick class/section scope, then assign subject + teacher to each period
+    (day × slot). Blank cells removed on save.
+  - **Time slots**: manage periods (start/end, sort order).
+- Views: `timetable/index` (printable grid), `timetable/edit_pick`, `timetable/edit`,
+  `timetable/slots`.
+
+### Guards
+- View: any login. Edit: admin + accountant. Slots add: admin.
+
 ### Next
-- Timetable module (class/teacher filters + print).
 - WhatsApp/SMS Notifications module.
