@@ -39,3 +39,28 @@ Initialized the SchoolERP project (PHP 8 + MySQL / XAMPP) in the repository root
 
 ### Environment note
 - XAMPP MySQL is running (port 3306) but `root` with empty password is currently rejected by the running server (the bundled `passwords.txt` says empty, but the live server denies it). Config targets root/empty per spec; final DB provisioning step will confirm/reset credentials.
+
+---
+
+## Milestone 2: Staff Management module (+ dashboard)
+
+### Added
+- `app/controllers/StaffController.php` — full CRUD for staff:
+  - List with search, role/status filters, pagination.
+  - Create / Edit forms with validation (employee_no & email uniqueness, role whitelist).
+  - Salary basis management (basic salary, allowances, deductions, bank account).
+  - Optional login credential creation/update tied to staff.
+  - Profile view showing personal/employment/salary + payroll history.
+  - Delete (admin only).
+- Views: `staff/index`, `staff/form`, `staff/show`.
+- Dashboard `index` wired with live stats, recent fee payments, upcoming exams.
+
+### Guards
+- Staff area restricted to `admin` and `accountant` roles; delete requires `admin`.
+
+### Committed
+- f5e42bb: scaffold; this milestone committed next.
+
+### Next
+- Students module (registration, class/section, bulk promotion).
+- Finance, Exams, Timetable, Notifications.
