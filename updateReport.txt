@@ -213,4 +213,32 @@ Then visit `http://127.0.0.1:8000/`, it will redirect to the installer (`/instal
      # ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '';
      Start-Service MySQL80
      ```
-  Then run the installer. Everything else already runs (verified login page + asset serving).
+   Then run the installer. Everything else already runs (verified login page + asset serving).
+
+---
+
+## Milestone 9: Database provisioned + admin password fix + verified end-to-end
+
+### Database provisioned
+- User provided the real MySQL root password (`root@bitdev` for the MySQL80 service).
+- Created `config/local.php` (git-ignored; holds the real credentials). Confirmed connection
+  to MySQL 8.0.42 and ran `php database/install.php` successfully.
+- Verified schema: **23 tables** created, default `2024-2025` session, 6 timetable slots, and
+  `admin` user present.
+
+### Fix: admin default password
+- The original seed hash was for `password`, **not** `admin123`. Regenerated a bcrypt hash for
+  `admin123`, updated the live DB (verified with `password_verify` = YES) and corrected the
+  `database/schema.sql` seed so fresh installs also use `admin123`. Default login is
+  **admin / admin123**.
+
+### Verified end-to-end (HTTP smoke test)
+- Built-in server + `_router.php`:
+  - Login page 200, CSRF token flows, login POST followed to Dashboard.
+  - All 21 module routes return 200 for the admin session: staff, students, classes,
+    promotion, finance (+fees, payments, payroll, generate, petty), exams (+create,
+    subjects), timetable (+slots, edit), notifications (+send, logs).
+
+### Git
+- `config/local.php` is confirmed git-ignored (secrets not committed).
+- Pushed to GitHub: `https://github.com/SaroshK-Tech/SchoolERP.git`

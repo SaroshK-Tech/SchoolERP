@@ -368,7 +368,7 @@ SELECT 'ADMIN0001', 'System', 'Administrator', 'admin', 'Administrator', 'Admini
 WHERE NOT EXISTS (SELECT 1 FROM staff WHERE role='admin');
 
 INSERT INTO users (username, password_hash, staff_id, role, is_active)
-SELECT 'admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', id, 'admin', 1
+SELECT 'admin', '$2y$12$1aLXn1yVAB8jDqt7quZb4eH9sMeFRzkBE.p3VwpoaUuFWTOWtpFZ2', id, 'admin', 1
 FROM staff WHERE role='admin' LIMIT 1;
 
 INSERT INTO timetable_slots (name, start_time, end_time, sort_order) VALUES
