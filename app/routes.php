@@ -10,6 +10,11 @@ spl_autoload_register(function (string $class): void {
     $file = __DIR__ . '/controllers/' . $class . '.php';
     if (is_file($file)) {
         require $file;
+        return;
+    }
+    $file = __DIR__ . '/services/' . $class . '.php';
+    if (is_file($file)) {
+        require $file;
     }
 });
 

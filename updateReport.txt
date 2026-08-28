@@ -138,5 +138,34 @@ Initialized the SchoolERP project (PHP 8 + MySQL / XAMPP) in the repository root
 ### Guards
 - View: any login. Edit: admin + accountant. Slots add: admin.
 
+---
+
+## Milestone 7: WhatsApp & SMS Notifications module
+
+### Added
+- `app/services/NotificationService.php` — unified sender:
+  - Queues every message to `notification_logs` with channel, phone, recipient, status.
+  - `dry_run` mode (default ON): marks messages as "sent" without real delivery — safe for
+    dev/testing. Disable by setting `notifications.dry_run=false` + Twilio credentials.
+  - `send()`/`deliver()` attempt real delivery via Twilio (SMS + WhatsApp Business) when
+    credentials configured; failures are recorded with status `failed` + error.
+  - Phone normalization to E.164 with default country code (92, Pakistan).
+- `app/controllers/NotificationController.php`:
+  - **Overview**: stats + recent notifications.
+  - **Compose/Send**: choose WhatsApp or SMS; recipients from students (guardian/self phone),
+    staff, or a custom number; multi-select with select-all.
+  - **Logs**: filterable log viewer (channel + status).
+- Views: `notifications/index`, `compose`, `logs`.
+- `app/views/errors/404.php` + service autoloading added.
+
+### Guards
+- All notification areas: any logged-in user.
+
 ### Next
-- WhatsApp/SMS Notifications module.
+- DB provisioning (install schema + confirm/reset MySQL root), smoke-test the running app,
+  and a few extras (login-required install guard).
+
+---
+
+## All 6 required modules now implemented
+Staff, Students (+classes/sections/promotion), Finance, Exams & Results, Timetable, Notifications.
