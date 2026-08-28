@@ -477,3 +477,20 @@ salary-basis save, matching `update()`.
   created and `kkashif` / `123456` logged in successfully (Dashboard).
 - The placeholder test record created during verification was removed afterwards so the user can
   re-add their staff member with correct details.
+
+---
+
+## Milestone 20: Fix "read error" when creating a class
+
+**Bug:** clicking "Add Class" produced an error on POST. The "Add Class" form posts to
+`classes/create`, but the POST route called `ClassController::store()`, whose method is **not
+defined** — the actual POST handler is named `create()`. This fatal aborted the request, and the
+class was never inserted.
+
+**Fix (`app/routes.php`):** changed the POST route `classes/create` to call `create()` instead of
+the non-existent `store()`.
+
+### Verified (end-to-end)
+- Created class "Grade 9" (code G9) with sections A and B via the web UI; the row and sections were
+  inserted and the page rendered correctly.
+- Test class removed afterwards to leave a clean state.
