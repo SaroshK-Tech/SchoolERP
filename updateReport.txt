@@ -430,3 +430,14 @@ button to the topbar in `app/views/layouts/app.php` (next to the avatar in `.use
 - Topbar shows the Logout button after login.
 - Clicking Logout signs the user out and returns to the login page; the session is cleared
   (accessing `/dashboard` afterwards redirects back to login).
+
+---
+
+## Milestone 17: Sunny admin login
+
+The user reported "admin id 'sunny' not logging in". Investigation found **no** `sunny` user or
+staff record in the DB (only `admin` and `superadmin`). Per the user's choice, a new admin was created:
+
+- Staff record `SUNNY0001` / "Sunny Admin" (role admin) + login user `sunny`.
+- **Login:** `sunny` / `admin123` (same password convention as the original admin).
+- Verified end-to-end: `sunny` logs in and reaches the Dashboard with the topbar showing "Sunny".
