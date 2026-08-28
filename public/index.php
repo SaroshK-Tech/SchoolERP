@@ -18,6 +18,9 @@ require $base . '/app/Schema.php';
 
 App::boot();
 
+// Fail fast with a clear message if the PHP mysqli extension is missing.
+check_mysqli();
+
 $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
 $requestPath = '/' . ltrim($requestPath, '/');
 $isBypass = in_array($requestPath, ['/login', '/install.php'], true)

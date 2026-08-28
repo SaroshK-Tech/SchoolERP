@@ -11,6 +11,10 @@ class Database
             return self::$instance;
         }
 
+        if (!function_exists('mysqli_connect')) {
+            throw new RuntimeException('The PHP mysqli extension is not loaded. SchoolERP requires mysqli. Use the XAMPP PHP (C:\xampp\php\php.exe).');
+        }
+
         $c = App::config('db');
         mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
         $db = new mysqli($c['host'], $c['user'], $c['pass'], $c['name'], (int)$c['port']);

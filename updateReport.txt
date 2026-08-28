@@ -262,3 +262,32 @@ Then visit `http://127.0.0.1:8000/`, it will redirect to the installer (`/instal
   ```
 - Verified: `install.php` returns 200 (no fatal), login page 200. Recorded in AGENTS.md so
   future sessions use the correct PHP.
+
+---
+
+## Milestone 11: Properly fix mysqli-missing fatal (defensive code, not just docs)
+
+Forcing people to "use the XAMPP PHP" only masks the problem. The app now handles the
+missing-extension case gracefully so it never crashes with
+`Call to undefined function mysqli_report()`.
+
+### Code changes
+- `app/helpers.php` — new `check_mysqli(bool $cli=false)` helper. Renders a clean, styled
+  error page (HTTP 500) explaining mysqli is missing and showing the exact dev-server command,
+  plus the offending PHP binary/version. In CLI mode (`$cli=true`) prints the message to STDERR
+  and exits non-zero.
+- `public/index.php` — calls `check_mysqli()` after boot, so the whole app fails fast with a
+  readable message instead of a fatal.
+- `public/install.php` — requires `helpers.php` and calls `check_mysqli()` before any mysqli use.
+- `database/install.php` (CLI) — inline guard: if `mysqli_connect` is missing, prints a clear
+  error and exits 1.
+- `app/Schema.php` — `Schema::installed()` returns `false` when mysqli is absent (defensive).
+- `app/Database.php` — `Database::conn()` throws a descriptive `RuntimeException` when mysqli
+  is missing.
+
+### Verified
+- With the **WinGet PHP (no mysqli)**: `/install.php` and `/` now return the clean
+  "The PHP mysqli extension is not loaded" page (no fatal). Confirmed the body shows the
+  XAMPP command + PHP 8.4.24 binary path.
+- Regression with the **XAMPP PHP**: login + all modules return 200 (staff, students,
+  promotion, finance, exams, timetable, notifications).

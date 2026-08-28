@@ -17,6 +17,10 @@ $config = array_replace_recursive(
 );
 $db = $config['db'];
 
+// Fail with a clear message (not a fatal) if the PHP mysqli extension is missing.
+require_once $root . '/app/helpers.php';
+check_mysqli();
+
 function install_html_start(string $title): void {
     echo '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">';
     echo '<title>' . htmlspecialchars($title) . '</title>';

@@ -7,6 +7,9 @@ class Schema
     public static function installed(): bool
     {
         try {
+            if (!function_exists('mysqli_connect')) {
+                return false;
+            }
             $db = App::config('db');
             mysqli_report(MYSQLI_REPORT_OFF);
             $conn = @new mysqli($db['host'], $db['user'], $db['pass'], $db['name'], (int)$db['port']);

@@ -5,6 +5,43 @@ declare(strict_types=1);
  * Global helper functions.
  */
 
+/**
+ * Ensure the mysqli extension is loaded. If not (e.g. the app is run with a PHP
+ * build that lacks mysqli), show a clear, actionable error instead of a fatal
+ * "Call to undefined function mysqli_report()" crash.
+ *
+ * When $cli is true, prints a plain-text message and exits with a non-zero code
+ * (used by the CLI installer).
+ */
+function check_mysqli(bool $cli = false): void
+{
+    if (function_exists('mysqli_connect')) {
+        return;
+    }
+
+    if ($cli) {
+        fwrite(STDERR, "ERROR: The PHP mysqli extension is not loaded.\n");
+        fwrite(STDERR, "This PHP build has no mysqli support, so SchoolERP cannot connect to MySQL.\n");
+        fwrite(STDERR, "Use the XAMPP PHP (C:\\xampp\\php\\php.exe), which has mysqli enabled.\n");
+        exit(1);
+    }
+
+    http_response_code(500);
+    header('Content-Type: text/html; charset=utf-8');
+    echo '<!DOCTYPE html><html><head><meta charset="utf-8"><title>PHP mysqli missing</title>';
+    echo '<link rel="stylesheet" href="assets/css/app.css"></head><body>';
+    echo '<div class="auth-wrap"><div class="auth-box"><div class="auth-head"><h1>Configuration error</h1>';
+    echo '<p>The PHP mysqli extension is not loaded</p></div><div class="auth-body">';
+    echo '<div class="alert alert-danger">SchoolERP requires the <strong>mysqli</strong> PHP extension, but the '
+        . 'current PHP build does not have it. Start the dev server with the XAMPP PHP which ships mysqli enabled:';
+    echo '<pre style="background:#0f172a;color:#a5f3fc;padding:12px;border-radius:8px;overflow:auto;">'
+        . htmlspecialchars('C:\xampp\php\php.exe -S 127.0.0.1:8000 -t public public\_router.php') . '</pre>';
+    echo '<p class="text-muted">Current PHP: ' . htmlspecialchars(phpversion() ?: 'unknown')
+        . ' &nbsp;&mdash;&nbsp; ' . htmlspecialchars(PHP_BINARY) . '</p>';
+    echo '</div></div></div></body></html>';
+    exit;
+}
+
 function e(mixed $value): string
 {
     return htmlspecialchars((string)($value ?? ''), ENT_QUOTES, 'UTF-8');

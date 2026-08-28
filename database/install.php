@@ -22,6 +22,14 @@ $db = $config['db'];
 echo "Installing SchoolERP database...\n";
 echo "Target: {$db['user']}@{$db['host']}:{$db['port']}  db={$db['name']}\n";
 
+if (!function_exists('mysqli_connect')) {
+    fwrite(STDERR, "ERROR: The PHP mysqli extension is not loaded.\n");
+    fwrite(STDERR, "This PHP build has no mysqli support. Use the XAMPP PHP:\n");
+    fwrite(STDERR, "  C:\\xampp\\php\\php.exe database/install.php\n");
+    fwrite(STDERR, "Current PHP binary: " . PHP_BINARY . "\n");
+    exit(1);
+}
+
 mysqli_report(MYSQLI_REPORT_OFF);
 $conn = @new mysqli($db['host'], $db['user'], $db['pass'], '', (int)$db['port']);
 if ($conn->connect_error) {
