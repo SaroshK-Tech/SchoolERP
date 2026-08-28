@@ -311,3 +311,31 @@ installation (outside the repo):
   finance, exams, timetable, notifications, `staff/create` all return 200.
 - The defensive `check_mysqli()` guard from Milestone 11 stays as a safety net (it now never
   triggers, but protects against any future PHP without mysqli).
+
+---
+
+## Milestone 13: Use XAMPP MySQL (MariaDB) — root has an empty password
+
+### What changed
+- The user is now using the **XAMPP MySQL/MariaDB** instance on port 3306
+  (`c:\xampp\mysql\bin\mysqld.exe`, data dir `c:\xampp\mysql\data`) instead of the MySQL80
+  Windows service. The old `root@bitdev` password belonged to the MySQL80 service and is
+  **rejected** by XAMPP.
+- XAMPP's default root already has an **empty password** (verified: root@localhost,
+  root@127.0.0.1, root@::1 all accept `''`). So no destructive skip-grant-tables was needed.
+
+### Steps taken
+- Updated `config/local.php` (git-ignored): `'pass' => ''` (removed `root@bitdev`).
+- Ran `php database/install.php` -> created `school_erp` on the XAMPP instance (it did not
+  exist there before; it had only been installed on MySQL80).
+- Default admin login seeded: `admin` / `admin123`.
+
+### Verified
+- Full end-to-end with XAMPP PHP: login lands on Dashboard; all 16 module routes return 200
+  (staff, students, classes, promotion, finance + fees/payroll/petty, exams, timetable,
+  notifications + send/logs).
+- Added `error.txt` to `.gitignore` (leftover diagnostic from the earlier mysqli issue).
+
+### Note
+- If MySQL80 is ever started again it will re-bind port 3306 and conflict with XAMPP; keep
+  only one running. The app now uses an empty root password matching `config/config.php`.

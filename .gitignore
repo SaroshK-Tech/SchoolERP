@@ -9,6 +9,7 @@ composer.lock
 *.log
 /storage/logs/*.log
 /storage/tmp/*
+error.txt
 
 # OS / editor
 .DS_Store
