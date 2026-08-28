@@ -229,6 +229,121 @@ class FinanceController
         ]);
     }
 
+    // ---------------- Fee vouchers (bulk generator) ----------------
+    public function vouchers(): void
+    {
+        require_login();
+        $classes = Database::all("SELECT * FROM classes ORDER BY numeric_rank, name");
+        $feesByClass = [];
+        foreach (Database::all("SELECT class_id, fee_type, amount, frequency FROM fee_structures WHERE is_active=1") as $f) {
+            $feesByClass[$f['class_id']][] = $f;
+        }
+        $vouchers = Database::all(
+            "SELECT v.*, c.name AS class_name, s.admission_no,
+                    CONCAT(s.first_name,' ',s.last_name) AS student_name, sess.name AS session_name
+             FROM fee_vouchers v
+             JOIN classes c ON c.id=v.class_id
+             JOIN students s ON s.id=v.student_id
+             LEFT JOIN academic_sessions sess ON sess.id=v.session_id
+             ORDER BY v.created_at DESC, v.id DESC LIMIT 200"
+        );
+        view('finance/vouchers', [
+            'classes' => $classes, 'feesByClass' => $feesByClass, 'vouchers' => $vouchers,
+            'title' => 'Fee Vouchers', 'page' => 'finance',
+        ]);
+    }
+
+    public function voucherGenerate(): void
+    {
+        require_role(['admin', 'accountant']);
+        csrf_check();
+        $classIds = $_POST['class_ids'] ?? [];
+        if (!is_array($classIds) || !$classIds) {
+            flash_set('danger', 'Select at least one class.');
+            redirect('finance/vouchers');
+        }
+        $classIds = array_map('intval', $classIds);
+        $issueDate = $_POST['issue_date'] ?? date('Y-m-d');
+        $dueDate = $_POST['due_date'] !== '' ? trim($_POST['due_date']) : null;
+        $label = trim($_POST['label'] ?? '');
+        $sessionId = $this->currentSession();
+
+        foreach ($classIds as $classId) {
+            $items = Database::all("SELECT fee_type, amount, frequency FROM fee_structures WHERE class_id=? AND is_active=1", [$classId]);
+            if (!$items) continue;
+
+            $students = Database::all(
+                "SELECT DISTINCT s.id
+                 FROM students s
+                 JOIN student_enrolments ce ON ce.student_id=s.id AND ce.session_id=? AND ce.class_id=?
+                 WHERE s.status IN ('active','promoted')",
+                [$sessionId, $classId]
+            );
+
+            foreach ($students as $stu) {
+                $total = array_sum(array_column($items, 'amount'));
+                $voucherNo = $this->uniqueVoucherNo();
+                $voucherId = (int)Database::insert(
+                    "INSERT INTO fee_vouchers (voucher_no, session_id, class_id, student_id, issue_date, due_date, label, total_amount, created_by)
+                     VALUES (?,?,?,?,?,?,?,?,?)",
+                    [$voucherNo, $sessionId, $classId, (int)$stu['id'], $issueDate, $dueDate, $label ?: null, $total, $this->currentStaffId()]
+                );
+                foreach ($items as $it) {
+                    Database::execute(
+                        "INSERT INTO fee_voucher_items (voucher_id, fee_type, amount, frequency) VALUES (?,?,?,?)",
+                        [$voucherId, $it['fee_type'], $it['amount'], $it['frequency']]
+                    );
+                }
+            }
+        }
+
+        flash_set('success', 'Fee vouchers generated for the selected class(es).');
+        redirect('finance/vouchers');
+    }
+
+    public function voucherShow(string $id): void
+    {
+        require_login();
+        $voucher = Database::one(
+            "SELECT v.*, c.name AS class_name, c.numeric_rank, s.admission_no, s.guardian_name, s.guardian_phone,
+                    s.phone, CONCAT(s.first_name,' ',s.last_name) AS student_name, s.email,
+                    sec.name AS section_name, sc.name AS session_name
+             FROM fee_vouchers v
+             JOIN classes c ON c.id=v.class_id
+             JOIN students s ON s.id=v.student_id
+             LEFT JOIN student_enrolments ce ON ce.student_id=v.student_id AND ce.session_id=v.session_id AND ce.class_id=v.class_id
+             LEFT JOIN sections sec ON sec.id=ce.section_id
+             LEFT JOIN academic_sessions sc ON sc.id=v.session_id
+             WHERE v.id=? LIMIT 1",
+            [(int)$id]
+        );
+        if (!$voucher) { flash_set('danger', 'Voucher not found.'); redirect('finance/vouchers'); }
+        $items = Database::all("SELECT * FROM fee_voucher_items WHERE voucher_id=? ORDER BY id", [(int)$id]);
+        view('finance/voucher_print', [
+            'voucher' => $voucher, 'items' => $items,
+            'title' => 'Fee Voucher #' . $voucher['voucher_no'],
+            'page' => 'finance',
+        ], false);
+    }
+
+    public function voucherDelete(string $id): void
+    {
+        require_role(['admin']);
+        csrf_check();
+        Database::execute("DELETE FROM fee_vouchers WHERE id=?", [(int)$id]);
+        flash_set('success', 'Voucher deleted.');
+        redirect('finance/vouchers');
+    }
+
+    private function uniqueVoucherNo(): string
+    {
+        $no = 'VCH-' . date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(3)));
+        while (Database::one("SELECT id FROM fee_vouchers WHERE voucher_no=?", [$no])) {
+            $no = 'VCH-' . date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(3)));
+        }
+        return $no;
+    }
+
     // ---------------- Petty income/expense ----------------
     public function pettyLedger(): void
     {

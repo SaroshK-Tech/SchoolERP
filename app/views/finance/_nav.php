@@ -3,6 +3,7 @@ $items = [
     ['finance', 'Overview', 'Overview'],
     ['finance/fees', 'Fee Management', 'Fees'],
     ['finance/fee-payments', 'Fee Payments', 'Payments'],
+    ['finance/vouchers', 'Fee Vouchers', 'Vouchers'],
     ['finance/payroll', 'Payroll', 'Payroll'],
     ['finance/petty', 'Petty Income & Expense', 'Petty'],
 ];

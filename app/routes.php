@@ -91,6 +91,12 @@ function register_routes(Router $route): void
     $route->post('finance/fees/collect', fn() => $fin->feeCollect());
     $route->get('finance/fee-payments', fn() => $fin->feePayments());
 
+    // Fee vouchers (bulk generator)
+    $route->get('finance/vouchers', fn() => $fin->vouchers());
+    $route->post('finance/vouchers/generate', fn() => $fin->voucherGenerate());
+    $route->get('finance/vouchers/{id}', fn($p) => $fin->voucherShow($p['id']));
+    $route->post('finance/vouchers/{id}/delete', fn($p) => $fin->voucherDelete($p['id']));
+
     // Petty income/expense
     $route->get('finance/petty', fn() => $fin->pettyLedger());
     $route->post('finance/petty/create', fn() => $fin->pettyCreate());

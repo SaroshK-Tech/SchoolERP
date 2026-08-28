@@ -176,6 +176,35 @@ CREATE TABLE IF NOT EXISTS fee_payments (
   FOREIGN KEY (recorded_by) REFERENCES staff(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
+-- Finance: fee vouchers (bulk-generated demand notes per student)
+CREATE TABLE IF NOT EXISTS fee_vouchers (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  voucher_no VARCHAR(40) NOT NULL UNIQUE,
+  session_id INT UNSIGNED NOT NULL,
+  class_id INT UNSIGNED NOT NULL,
+  student_id INT UNSIGNED NOT NULL,
+  issue_date DATE NOT NULL,
+  due_date DATE NULL,
+  label VARCHAR(80) NULL,                        -- e.g. "June Term", "1st Quarter"
+  total_amount DECIMAL(12,2) NOT NULL DEFAULT 0,
+  status ENUM('issued','paid','cancelled') NOT NULL DEFAULT 'issued',
+  created_by INT UNSIGNED NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (session_id) REFERENCES academic_sessions(id) ON DELETE CASCADE,
+  FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE,
+  FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+  FOREIGN KEY (created_by) REFERENCES staff(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS fee_voucher_items (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  voucher_id INT UNSIGNED NOT NULL,
+  fee_type VARCHAR(60) NOT NULL,
+  amount DECIMAL(12,2) NOT NULL DEFAULT 0,
+  frequency ENUM('monthly','term','yearly','one-time') NOT NULL DEFAULT 'monthly',
+  FOREIGN KEY (voucher_id) REFERENCES fee_vouchers(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
 -- ------------------------------------------------------------
 -- Finance: payroll
 -- ------------------------------------------------------------

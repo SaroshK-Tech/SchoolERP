@@ -494,3 +494,32 @@ the non-existent `store()`.
 - Created class "Grade 9" (code G9) with sections A and B via the web UI; the row and sections were
   inserted and the page rendered correctly.
 - Test class removed afterwards to leave a clean state.
+
+---
+
+## Milestone 21: Bulk fee voucher generator by classes
+
+Added a bulk **fee voucher** generator under Finance → Fee Vouchers. For the selected class(es) it
+creates one saved fee voucher (demand note/challan) for **every** enrolled active student in the
+current session, itemizing that class's active `fee_structures`, with a unique voucher number, and
+provides a printable single-voucher page.
+
+- **New tables** (`database/schema.sql`): `fee_vouchers` (header: voucher_no, session, class,
+  student, issue/due date, label, total, status issued/paid/cancelled) and `fee_voucher_items`
+  (line-item breakdown). `fee_voucher_items.voucher_id` has `ON DELETE CASCADE`.
+- **Routes**: `GET finance/vouchers`, `POST finance/vouchers/generate`,
+  `GET finance/vouchers/{id}` (print), `POST finance/vouchers/{id}/delete`.
+- **Controller** (`FinanceController`): `vouchers()`, `voucherGenerate()`, `voucherShow()`,
+  `voucherDelete()`, `uniqueVoucherNo()`.
+- **Views**: `finance/vouchers.php` (generator + list) and `finance/voucher_print.php`
+  (standalone printable voucher). Added a `Vouchers` button to the finance sub-nav.
+
+### Note / fix during testing
+MariaDB does not support `LIMIT` inside an `IN (subquery)` used to look up the student's section
+in `voucherShow()`. Rewrote it with direct `LEFT JOIN student_enrolments/sections`.
+
+### Verified (end-to-end)
+- Generator page renders; posting generates vouchers for the class's students; voucher and its
+  items are saved (total = sum of fee structures).
+- A voucher prints correctly with itemized fees, total, due date, and print button.
+- Test voucher removed afterwards to leave a clean state; live `fee_voucher_items` FK added.
